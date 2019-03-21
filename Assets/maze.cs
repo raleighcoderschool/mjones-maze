@@ -17,8 +17,8 @@ public class maze : MonoBehaviour {
     // 2 - top
     // 4 - left
     // 8 - bottom
-    static private int xSize = 1500; // max 200x200? 
-    static private int ySize = 30;
+    static private int xSize = 3; // max 200x200 or 1500x30
+    static private int ySize = 3;
     private int[,] map = new int[xSize, ySize];
     private int currentx = 0;
     private int currenty = 0;
@@ -99,6 +99,16 @@ public class maze : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private List<Vector2Int> SolveMaze(int startx, int starty, int endx, int endy)
+    {
+        List<Vector2Int> solution = new List<Vector2Int>();
+        int[,] visited = new int[xSize, ySize];
+
+
+
+        return solution;
     }
 
     // Use this for initialization
