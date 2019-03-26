@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class maze : MonoBehaviour {
 
@@ -22,6 +24,7 @@ public class maze : MonoBehaviour {
     private int[,] map = new int[xSize, ySize];
     private int currentx = 0;
     private int currenty = 0;
+    int[,] visited = new int[xSize, ySize];
 
     List<string> SwapElements(List<string> list, int k, int l)
     {
@@ -101,14 +104,37 @@ public class maze : MonoBehaviour {
         }
     }
 
-    private List<Vector2Int> SolveMaze(int startx, int starty, int endx, int endy)
+    private bool SolveMaze(int startx, int starty, int endx, int endy)
     {
-        List<Vector2Int> solution = new List<Vector2Int>();
-        int[,] visited = new int[xSize, ySize];
-
-
-
-        return solution;
+        
+        visited[startx, starty] = 1;
+        if (startx == endx && starty == endy)
+        {
+            print("call");
+            return true;
+        }
+        else
+        {
+            tilemap.SetTileFlags(new Vector3Int(startx, starty, 0), TileFlags.None);
+            tilemap.SetColor(new Vector3Int(startx, starty, 0), Color.black);
+            tilemap.RefreshTile(new Vector3Int(startx, starty, 0));
+            print("call2");
+            bool result = false;
+            if (startx != xSize - 1 && visited[startx + 1, starty] != 1 && Convert.ToBoolean(map[startx, starty] & 8))
+                result = result | SolveMaze(startx + 1, starty, endx, endy);
+            if (startx != 0 && visited[startx - 1, starty] != 1 && Convert.ToBoolean(map[startx, starty] & 2))
+                result = result | SolveMaze(startx - 1, starty, endx, endy);
+            if (starty != ySize - 1 && visited[startx, starty + 1] != 1 && Convert.ToBoolean(map[startx, starty] & 1))
+                result = result | SolveMaze(startx, starty + 1, endx, endy);
+            if (starty != 0 && visited[startx, starty - 1] != 1 && Convert.ToBoolean(map[startx, starty] & 4))
+                result = result | SolveMaze(startx, starty - 1, endx, endy);
+            if (result)
+            {
+                //tilemap.SetColor(new Vector3Int(startx, starty, 0), new Color(1, 1, 1));
+                return true;
+            }
+        }
+        return false;
     }
 
     // Use this for initialization
@@ -221,7 +247,7 @@ public class maze : MonoBehaviour {
                 }
 
             }
-
+        SolveMaze(0, 0, xSize - 1, ySize - 1);
     }
 	
 	// Update is called once per frame
