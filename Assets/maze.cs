@@ -13,18 +13,20 @@ public class maze : MonoBehaviour {
     public Tile twoexitacross;
     public Tile threeexit;
     public Tile fourexit;
+    public Tilemap solution;
+    public Tile dot;
 
     // bit packed array
     // 1 - right opening
     // 2 - top
     // 4 - left
     // 8 - bottom
-    static private int xSize = 3; // max 200x200 or 1500x30
-    static private int ySize = 3;
+    static private int xSize = 5; // max 200x200 or 1500x30
+    static private int ySize = 5;
     private int[,] map = new int[xSize, ySize];
     private int currentx = 0;
     private int currenty = 0;
-    int[,] visited = new int[xSize, ySize];
+    private int[,] visited = new int[xSize, ySize];
 
     List<string> SwapElements(List<string> list, int k, int l)
     {
@@ -115,22 +117,36 @@ public class maze : MonoBehaviour {
         }
         else
         {
-            tilemap.SetTileFlags(new Vector3Int(startx, starty, 0), TileFlags.None);
-            tilemap.SetColor(new Vector3Int(startx, starty, 0), Color.black);
-            tilemap.RefreshTile(new Vector3Int(startx, starty, 0));
-            print("call2");
+            //tilemap.SetTileFlags(new Vector3Int(startx, starty, 0), TileFlags.None);
+            //tilemap.SetColor(new Vector3Int(startx, starty, 0), Color.black);
+            //tilemap.RefreshTile(new Vector3Int(startx, starty, 0));
+            //print(startx + " " + starty);
+            solution.SetTile(new Vector3Int(startx, starty, 0), dot);
             bool result = false;
-            if (startx != xSize - 1 && visited[startx + 1, starty] != 1 && Convert.ToBoolean(map[startx, starty] & 8))
-                result = result | SolveMaze(startx + 1, starty, endx, endy);
-            if (startx != 0 && visited[startx - 1, starty] != 1 && Convert.ToBoolean(map[startx, starty] & 2))
-                result = result | SolveMaze(startx - 1, starty, endx, endy);
-            if (starty != ySize - 1 && visited[startx, starty + 1] != 1 && Convert.ToBoolean(map[startx, starty] & 1))
-                result = result | SolveMaze(startx, starty + 1, endx, endy);
-            if (starty != 0 && visited[startx, starty - 1] != 1 && Convert.ToBoolean(map[startx, starty] & 4))
-                result = result | SolveMaze(startx, starty - 1, endx, endy);
+            if (startx != xSize - 1 && visited[startx + 1, starty] != 0 && Convert.ToBoolean(map[startx, starty] & 8))
+            {
+                print(startx + " " + starty + " right");
+                result = result || SolveMaze(startx + 1, starty, endx, endy);
+            }
+            if (startx != 0 && visited[startx - 1, starty] != 0 && Convert.ToBoolean(map[startx, starty] & 2))
+            {
+                print(startx + " " + starty + " left");
+                result = result || SolveMaze(startx - 1, starty, endx, endy);
+            }
+            if (starty != ySize - 1 && visited[startx, starty + 1] != 0 && Convert.ToBoolean(map[startx, starty] & 1))
+            {
+                print(startx + " " + starty + " up");
+                result = result || SolveMaze(startx, starty + 1, endx, endy);
+            }
+            if (starty != 0 && visited[startx, starty - 1] != 0 && Convert.ToBoolean(map[startx, starty] & 4))
+            {
+                print(startx + " " + starty + " down");
+                result = result || SolveMaze(startx, starty - 1, endx, endy);
+            }
             if (result)
             {
-                //tilemap.SetColor(new Vector3Int(startx, starty, 0), new Color(1, 1, 1));
+                tilemap.SetColor(new Vector3Int(startx, starty, 0), new Color(1, 1, 1));
+                solution.SetTile(new Vector3Int(starty, startx, 0), dot);
                 return true;
             }
         }
@@ -140,6 +156,7 @@ public class maze : MonoBehaviour {
     // Use this for initialization
     void Start () {
         ChooseRandomDirection(0, 0);
+        // render tiles
         for (int i = 0; i < xSize; i++)
             for (int k = 0; k < ySize; k++)
             {
@@ -247,6 +264,9 @@ public class maze : MonoBehaviour {
                 }
 
             }
+        for (int i = 0; i < xSize; i++)
+            for (int k = 0; k < ySize; k++)
+                visited[i, k] = 0;
         SolveMaze(0, 0, xSize - 1, ySize - 1);
     }
 	
