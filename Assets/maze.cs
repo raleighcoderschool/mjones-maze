@@ -21,8 +21,9 @@ public class maze : MonoBehaviour {
     // 2 - top
     // 4 - left
     // 8 - bottom
-    static private int xSize = 200; // max 200x200 or 1500x30
-    static private int ySize = 200;
+    // 8 and 2 swapped? depending on perspective
+    static private int xSize = 50; // max 200x200 or 1500x30
+    static private int ySize = 50;
     private int[,] map = new int[xSize, ySize];
     private int currentx = 0;
     private int currenty = 0;
@@ -108,54 +109,50 @@ public class maze : MonoBehaviour {
 
     private bool SolveMaze(int startx, int starty, int endx, int endy, int recursiveDepth)
     {
-        print(map[startx, starty]);
-        solution.SetTile(new Vector3Int(startx, starty, 0), dot);
-        if (recursiveDepth > 0)
+        //print(recursiveDepth);
+        //solution.SetTile(new Vector3Int(startx, starty, 0), dot);
+        if (recursiveDepth > 10000)
+        {
+            print("Recursive depth reached");
             return false;
-
+        }
 
         visited[startx, starty] = 1;
+        bool result = false;
         if (startx == endx && starty == endy)
         {
-            print("call");
-            return true;
+            result = true;
         }
         else
         {
-            //tilemap.SetTileFlags(new Vector3Int(startx, starty, 0), TileFlags.None);
-            //tilemap.SetColor(new Vector3Int(startx, starty, 0), Color.black);
-            //tilemap.RefreshTile(new Vector3Int(startx, starty, 0));
-            //print(startx + " " + starty);
-            
-            bool result = false;
-            if (startx != xSize - 1 && visited[startx + 1, starty] != 0 && Convert.ToBoolean(map[startx, starty] & 8))
+            // right
+            if (startx != xSize - 1 && visited[startx + 1, starty] == 0 && Convert.ToBoolean(map[startx, starty] & 1))
             {
-                print(startx + " " + starty + " right");
                 result = result || SolveMaze(startx + 1, starty, endx, endy, recursiveDepth+1);
             }
-            if (startx != 0 && visited[startx - 1, starty] != 0 && Convert.ToBoolean(map[startx, starty] & 2))
+            // left
+            if (startx != 0 && visited[startx - 1, starty] == 0 && Convert.ToBoolean(map[startx, starty] & 4))
             {
-                print(startx + " " + starty + " left");
                 result = result || SolveMaze(startx - 1, starty, endx, endy, recursiveDepth + 1);
             }
-            if (starty != ySize - 1 && visited[startx, starty + 1] != 0 && Convert.ToBoolean(map[startx, starty] & 1))
+            // top
+            if (starty != ySize - 1 && visited[startx, starty + 1] == 0 && Convert.ToBoolean(map[startx, starty] & 8))
             {
-                print(startx + " " + starty + " up");
                 result = result || SolveMaze(startx, starty + 1, endx, endy, recursiveDepth + 1);
             }
-            if (starty != 0 && visited[startx, starty - 1] != 0 && Convert.ToBoolean(map[startx, starty] & 4))
+            // bot
+            if (starty != 0 && visited[startx, starty - 1] == 0 && Convert.ToBoolean(map[startx, starty] & 2))
             {
-                print(startx + " " + starty + " down");
                 result = result || SolveMaze(startx, starty - 1, endx, endy, recursiveDepth + 1);
             }
-            if (result)
-            {
-                tilemap.SetColor(new Vector3Int(startx, starty, 0), new Color(1, 1, 1));
-                solution.SetTile(new Vector3Int(starty, startx, 0), dot);
-                return true;
-            }
         }
-        return false;
+        if (result)
+        {
+            solution.SetTile(new Vector3Int(startx, starty, 0), dot);
+            return true;
+        }
+        else
+            return false;
     }
 
     // Use this for initialization
