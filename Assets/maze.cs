@@ -22,8 +22,8 @@ public class maze : MonoBehaviour {
     // 4 - left
     // 8 - bottom
     // 8 and 2 swapped? depending on perspective
-    static private int xSize = 50; // max 200x200 or 1500x30
-    static private int ySize = 50;
+    static private int xSize = 150; // max 200x200 or 1500x30
+    static private int ySize = 150;
     private int[,] map = new int[xSize, ySize];
     private int currentx = 0;
     private int currenty = 0;
